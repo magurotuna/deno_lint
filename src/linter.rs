@@ -1,5 +1,6 @@
 // Copyright 2020 the Deno authors. All rights reserved. MIT license.
-use crate::diagnostic::{LintDiagnostic, Position, Range};
+use crate::diagnostic::LintDiagnostic;
+use crate::diagnostic::Location;
 use crate::rules::LintRule;
 use crate::scopes::{analyze, Scope};
 use crate::swc_util::get_default_ts_config;
@@ -49,29 +50,39 @@ impl Context {
     code: &str,
     message: &str,
   ) -> LintDiagnostic {
-    let time_start = Instant::now();
-    let start: Position = self.source_map.lookup_char_pos(span.lo()).into();
-    let end: Position = self.source_map.lookup_char_pos(span.hi()).into();
+    let start = Instant::now();
+    let location = self.source_map.lookup_char_pos(span.lo());
+    let line_src = self
+      .source_map
+      .lookup_source_file(span.lo())
+      .get_line(location.line - 1)
+      .expect("error loading line soruce")
+      .to_string();
+
+    let snippet_length = self
+      .source_map
+      .span_to_snippet(self.source_map.span_until_char(span, '\n'))
+      .expect("error loading snippet")
+      .len();
 
     let diagnostic = LintDiagnostic {
-      range: Range { start, end },
+      location: location.into(),
       filename: self.file_name.clone(),
       message: message.to_string(),
       code: code.to_string(),
+      line_src,
+      snippet_length,
     };
 
-    let time_end = Instant::now();
-    debug!(
-      "Context::create_diagnostic took {:?}",
-      time_end - time_start
-    );
+    let end = Instant::now();
+    debug!("Context::create_diagnostic took {:?}", end - start);
     diagnostic
   }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct IgnoreDirective {
-  pub position: Position,
+  pub location: Location,
   pub span: Span,
   pub codes: Vec<String>,
   pub used_codes: HashMap<String, bool>,
@@ -84,7 +95,7 @@ impl IgnoreDirective {
     &mut self,
     diagnostic: &LintDiagnostic,
   ) -> bool {
-    if self.position.line != diagnostic.range.start.line - 1 {
+    if self.location.line != diagnostic.location.line - 1 {
       return false;
     }
 
@@ -307,8 +318,7 @@ impl Linter {
       }
     }
 
-    filtered_diagnostics
-      .sort_by(|a, b| a.range.start.line.cmp(&b.range.start.line));
+    filtered_diagnostics.sort_by(|a, b| a.location.line.cmp(&b.location.line));
 
     let end = Instant::now();
     debug!("Linter::filter_diagnostics took {:#?}", end - start);
@@ -399,7 +409,7 @@ fn parse_ignore_directives(
   });
 
   ignore_directives
-    .sort_by(|a, b| a.position.line.partial_cmp(&b.position.line).unwrap());
+    .sort_by(|a, b| a.location.line.partial_cmp(&b.location.line).unwrap());
   ignore_directives
 }
 
@@ -432,7 +442,7 @@ fn parse_ignore_comment(
       });
 
       return Some(IgnoreDirective {
-        position: location.into(),
+        location: location.into(),
         span: comment.span,
         codes,
         used_codes,
@@ -494,16 +504,16 @@ object | undefined {}
 
     assert_eq!(directives.len(), 4);
     let d = &directives[0];
-    assert_eq!(d.position, Position { line: 2, col: 0 });
+    assert_eq!(d.location, Location { line: 2, col: 0 });
     assert_eq!(d.codes, vec!["no-explicit-any", "no-empty", "no-debugger"]);
     let d = &directives[1];
-    assert_eq!(d.position, Position { line: 8, col: 0 });
+    assert_eq!(d.location, Location { line: 8, col: 0 });
     assert_eq!(d.codes, vec!["no-explicit-any", "no-empty", "no-debugger"]);
     let d = &directives[2];
-    assert_eq!(d.position, Position { line: 11, col: 0 });
+    assert_eq!(d.location, Location { line: 11, col: 0 });
     assert_eq!(d.codes, vec!["no-explicit-any", "no-empty", "no-debugger"]);
     let d = &directives[3];
-    assert_eq!(d.position, Position { line: 17, col: 3 });
+    assert_eq!(d.location, Location { line: 17, col: 3 });
     assert_eq!(d.codes, vec!["ban-types"]);
   }
 }
