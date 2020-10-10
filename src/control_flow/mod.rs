@@ -165,9 +165,9 @@ impl Analyzer<'_> {
           }
         }
         BlockKind::Case => {
-          if let Done::Forced = done {
-            self.mark_as_done(lo, done);
-          }
+          //if let Done::Forced = done {
+          //self.mark_as_done(lo, done);
+          //}
         }
         BlockKind::If => {}
         BlockKind::Loop => {}
@@ -186,6 +186,7 @@ impl Analyzer<'_> {
   }
 
   fn is_forced_done(&self, lo: BytePos) -> bool {
+    dbg!(lo, self.get_done_reason(lo));
     match self.get_done_reason(lo) {
       Some(Done::Forced) => true,
       _ => false,
@@ -337,6 +338,8 @@ impl Visit for Analyzer<'_> {
         .map(|case| case.span.lo)
         .all(|lo| self.is_forced_done(lo));
 
+    dbg!(is_done, prev_done);
+
     // A switch statement is finisher or not.
     if is_done {
       self.mark_as_done(n.span.lo, Done::Forced);
@@ -359,6 +362,8 @@ impl Visit for Analyzer<'_> {
       }
     });
 
+    dbg!(prev_done, case_done, n.span.lo);
+
     if let Some(Done::Forced) = case_done {
       self.mark_as_done(n.span.lo, Done::Forced);
     }
@@ -375,6 +380,8 @@ impl Visit for Analyzer<'_> {
     });
 
     let cons_reason = self.get_done_reason(n.cons.span().lo);
+
+    dbg!(prev_done, cons_reason);
 
     match &n.alt {
       Some(alt) => {
@@ -400,6 +407,7 @@ impl Visit for Analyzer<'_> {
         }
       }
       None => {
+        dbg!("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
         self.scope.done = prev_done;
       }
     }

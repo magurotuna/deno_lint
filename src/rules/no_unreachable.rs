@@ -462,6 +462,38 @@ function normalize(type: string): string | undefined {
   }
 
   #[test]
+  fn maguro1() {
+    assert_lint_ok::<NoUnreachable>(
+      r#"
+      switch (a) {
+        default: {
+          if (b) {
+            break;
+          }
+          return 2;
+        }
+      }
+      foo();
+      "#,
+    );
+  }
+
+  #[test]
+  fn maguro2() {
+    assert_lint_ok::<NoUnreachable>(
+      r#"
+      switch (a) {
+        default: {
+          return 2;
+          break;
+        }
+      }
+      foo();
+      "#,
+    );
+  }
+
+  #[test]
   fn deno_ok_1() {
     assert_lint_ok::<NoUnreachable>(
       r#"
