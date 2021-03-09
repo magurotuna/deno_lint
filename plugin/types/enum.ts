@@ -37,6 +37,8 @@ import {
   JSXFragment,
   JSXMemberExpr,
   JSXNamespacedName,
+  JSXExprContainer,
+  JSXSpreadChild,
   JSXText,
   LabeledStmt,
   MemberExpr,
@@ -80,6 +82,9 @@ import {
   WhileStmt,
   WithStmt,
   YieldExpr,
+  ImportNamedSpecifier,
+  ImportDefaultSpecifier,
+  ImportStarAsSpecifier,
 } from "./ast.ts";
 
 export type Pat =
@@ -158,6 +163,16 @@ export type Decl =
   | TsEnumDecl
   | TsModuleDecl;
 
+export type DefaultDecl = 
+  | ClassExpr
+  | FnExpr
+  | TsInterfaceDecl
+
+export type ImportSpecifier = 
+  | ImportNamedSpecifier
+  | ImportDefaultSpecifier
+  | ImportStarAsSpecifier
+
 export type Lit =
   | Str
   | Bool
@@ -170,6 +185,10 @@ export type Lit =
 export type BodyStmtOrExpr = BlockStmt | Expr;
 
 export type PatOrExpr = Expr | Pat;
+
+export type VarDeclOrPat = VarDecl | Pat;
+
+export type VarDeclOrExpr = VarDecl | Expr;
 
 export type PropName =
   | Ident
@@ -280,3 +299,27 @@ export type In = "in";
 export type InstanceOf = "instanceof";
 export type Exp = "**";
 export type NullishCoalescing = "??";
+
+export type JSXAttrName = Ident | JSXNamespacedName;
+
+export type JSXAttrValue =
+  | Lit
+  | JSXExprContainer
+  | JSXElement
+  | JSXFragment;
+
+export type JSXElementName =
+  | Ident
+  | JSXMemberExpr
+  | JSXNamespacedName;
+
+export type JSXElementChild = 
+  | JSXText
+  | JSXExprContainer
+  | JSXSpreadChild
+  | JSXElement
+  | JSXFragment
+
+export type JSXExpr = JSXEmptyExpr | Expr;
+
+export type JSXObject = JSXMemberExpr | Ident;

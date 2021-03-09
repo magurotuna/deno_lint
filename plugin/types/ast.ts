@@ -1,4 +1,4 @@
-import { IntoNode, Spanned } from "./common.ts";
+import { IntoNode, Spanned, Span } from "./common.ts";
 import {
   Accessibility,
   AssignOp,
@@ -13,6 +13,17 @@ import {
   PatOrExpr,
   PropName,
   Stmt,
+  DefaultDecl,
+  ImportSpecifier,
+  Decl,
+  VarDeclOrPat,
+  VarDeclOrExpr,
+  JSXAttrName,
+  JSXAttrValue,
+  JSXElementName,
+  JSXElementChild,
+  JSXExpr,
+  JSXObject,
 } from "./enum.ts";
 
 export interface ArrayLit extends IntoNode, Spanned {
@@ -197,10 +208,13 @@ export interface DebuggerStmt extends IntoNode, Spanned {
 
 export interface Decorator extends IntoNode, Spanned {
   kind: "Decorator";
+  expr: () => Expr;
 }
 
 export interface DoWhileStmt extends IntoNode, Spanned {
   kind: "DoWhileStmt";
+  test: () => Expr;
+  body: () => Stmt;
 }
 
 export interface EmptyStmt extends IntoNode, Spanned {
@@ -209,90 +223,140 @@ export interface EmptyStmt extends IntoNode, Spanned {
 
 export interface ExportAll extends IntoNode, Spanned {
   kind: "ExportAll";
+  src: () => Str;
+  asserts: () => ObjectLit | null;
 }
 
 export interface ExportDecl extends IntoNode, Spanned {
   kind: "ExportDecl";
+  decl: () => Decl;
 }
 
 export interface ExportDefaultDecl extends IntoNode, Spanned {
   kind: "ExportDefaultDecl";
+  decl: () => DefaultDecl;
 }
 
 export interface ExportDefaultExpr extends IntoNode, Spanned {
   kind: "ExportDefaultExpr";
+  expr: () => Expr;
 }
 
 export interface ExportDefaultSpecifier extends IntoNode, Spanned {
   kind: "ExportDefaultSpecifier";
+  exported: () => Ident;
 }
 
 export interface ExportNamedSpecifier extends IntoNode, Spanned {
   kind: "ExportNamedSpecifier";
+  orig: () => Ident;
+  exported: () => Ident | null;
 }
 
 export interface ExportNamespaceSpecifier extends IntoNode, Spanned {
   kind: "ExportNamespaceSpecifier";
+  name: () => Ident;
 }
 
 export interface ExprOrSpread extends IntoNode, Spanned {
   kind: "ExprOrSpread";
+  expr: () => Expr;
+  spread: () => Span | null;
 }
 
 export interface ExprStmt extends IntoNode, Spanned {
   kind: "ExprStmt";
+  expr: () => Expr;
 }
 
 export interface FnDecl extends IntoNode, Spanned {
   kind: "FnDecl";
+  ident: () => Ident;
+  function: () => Function_;
+  declare: () => boolean;
 }
 
 export interface FnExpr extends IntoNode, Spanned {
   kind: "FnExpr";
+  ident: () => Ident | null;
+  function: () => Function_;
 }
 
 export interface ForInStmt extends IntoNode, Spanned {
   kind: "ForInStmt";
+  left: () => VarDeclOrPat;
+  right: () => Expr;
+  body: () => Stmt;
 }
 
 export interface ForOfStmt extends IntoNode, Spanned {
   kind: "ForOfStmt";
+  left: () => VarDeclOrPat;
+  right: () => Expr;
+  body: () => Stmt;
 }
 
 export interface ForStmt extends IntoNode, Spanned {
   kind: "ForStmt";
+  init: () => VarDeclOrExpr | null;
+  test: () => Expr | null;
+  update: () => Expr | null;
+  body: () => Stmt;
 }
 
 export interface Function_ extends IntoNode, Spanned {
   kind: "Function";
+  params: () => Readonly<Param>;
+  decorators: () => Readonly<Decorator>;
+  body: () => BlockStmt | null;
+  typeParams: () => TsTypeParamDecl | null;
+  returnType: () => TsTypeAnn | null;
+  isGenerator: () => boolean;
+  isAsync: () => boolean;
 }
 
 export interface GetterProp extends IntoNode, Spanned {
   kind: "GetterProp";
+  key: () => PropName;
+  typeAnn: () => TsTypeAnn | null;
+  body: () => BlockStmt | null;
 }
 
 export interface Ident extends IntoNode, Spanned {
   kind: "Ident";
+  sym: () => string;
+  optional: () => boolean;
 }
 
 export interface IfStmt extends IntoNode, Spanned {
   kind: "IfStmt";
+  test: () => Expr;
+  cons: () => Stmt;
+  alt: () => Stmt | null;
 }
 
 export interface ImportDecl extends IntoNode, Spanned {
   kind: "ImportDecl";
+  specifiers: () => ReadonlyArray<ImportSpecifier>;
+  src: () => Str;
+  asserts: () => ObjectLit | null;
+  typeOnly: () => boolean;
 }
 
 export interface ImportDefaultSpecifier extends IntoNode, Spanned {
   kind: "ImportDefaultSpecifier";
+  local: () => Ident;
 }
 
 export interface ImportNamedSpecifier extends IntoNode, Spanned {
   kind: "ImportNamedSpecifier";
+  local: () => Ident;
+  imported: () => Ident | null;
 }
 
 export interface ImportStarAsSpecifier extends IntoNode, Spanned {
   kind: "ImportStarAsSpecifier";
+  local: () => Ident;
 }
 
 export interface Invalid extends IntoNode, Spanned {
@@ -301,10 +365,13 @@ export interface Invalid extends IntoNode, Spanned {
 
 export interface JSXAttr extends IntoNode, Spanned {
   kind: "JSXAttr";
+  name: () => JSXAttrName;
+  value: () => JSXAttrValue | null;
 }
 
 export interface JSXClosingElement extends IntoNode, Spanned {
   kind: "JSXClosingElement";
+  name: () => JSXElementName;
 }
 
 export interface JSXClosingFragment extends IntoNode, Spanned {
@@ -313,6 +380,9 @@ export interface JSXClosingFragment extends IntoNode, Spanned {
 
 export interface JSXElement extends IntoNode, Spanned {
   kind: "JSXElement";
+  opening: () => JSXOpeningElement;
+  children: () => ReadonlyArray<JSXElementChild>;
+  closing: () => JSXClosingElement | null;
 }
 
 export interface JSXEmptyExpr extends IntoNode, Spanned {
@@ -321,18 +391,26 @@ export interface JSXEmptyExpr extends IntoNode, Spanned {
 
 export interface JSXExprContainer extends IntoNode, Spanned {
   kind: "JSXExprContainer";
+  expr: () => JSXExpr;
 }
 
 export interface JSXFragment extends IntoNode, Spanned {
   kind: "JSXFragment";
+  opening: () => JSXOpeningFragment;
+  children: () => ReadonlyArray<JSXElementChild>;
+  closing: () => JSXClosingFragment | null;
 }
 
 export interface JSXMemberExpr extends IntoNode, Spanned {
   kind: "JSXMemberExpr";
+  obj: () => JSXObject;
+  prop: () => Ident;
 }
 
 export interface JSXNamespacedName extends IntoNode, Spanned {
   kind: "JSXNamespacedName";
+  ns: () => Ident;
+  name: () => Ident;
 }
 
 export interface JSXOpeningElement extends IntoNode, Spanned {
