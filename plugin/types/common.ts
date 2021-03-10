@@ -161,13 +161,7 @@ import {
   YieldExpr,
 } from "./ast.ts";
 
-export interface Node {
-  content: () => NodeContent;
-  parent: () => Node | null;
-  children: () => ReadonlyArray<Node>;
-}
-
-export type NodeContent =
+export type Node =
   | ArrayLit
   | ArrayPat
   | ArrowExpr
@@ -329,10 +323,11 @@ export type NodeContent =
   | WithStmt
   | YieldExpr;
 
-export type NodeKind = NodeContent["kind"];
+export type NodeKind = Node["nodeKind"];
 
-export interface IntoNode {
-  intoNode: () => Node;
+export interface Traverse {
+  parentNode: () => Node | null;
+  childNodes: () => ReadonlyArray<Node>;
 }
 
 export interface Span {
@@ -341,6 +336,6 @@ export interface Span {
   ctxt: number;
 }
 
-export interface Spanned {
-  span: () => Span;
+export interface HasSpan {
+  span: Span;
 }
