@@ -137,7 +137,11 @@ import {
   WhileStmt,
   WithStmt,
   YieldExpr,
+  Module,
+  Script,
 } from "./ast.ts";
+
+export type Program = Module | Script;
 
 export type ModuleItem = ModuleDecl | Stmt;
 
