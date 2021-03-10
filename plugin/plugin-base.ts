@@ -10,8 +10,8 @@ import type {
   AssignProp,
   AwaitExpr,
   BigInt_,
-  BinExpr,
   BindingIdent,
+  BinExpr,
   BlockStmt,
   Bool,
   BreakStmt,
@@ -107,8 +107,8 @@ import type {
   TsCallSignatureDecl,
   TsConditionalType,
   TsConstAssertion,
-  TsConstructSignatureDecl,
   TsConstructorType,
+  TsConstructSignatureDecl,
   TsEnumDecl,
   TsEnumMember,
   TsExportAssignment,
@@ -117,8 +117,8 @@ import type {
   TsFnType,
   TsImportEqualsDecl,
   TsImportType,
-  TsIndexSignature,
   TsIndexedAccessType,
+  TsIndexSignature,
   TsInferType,
   TsInterfaceBody,
   TsInterfaceDecl,
@@ -169,12 +169,16 @@ function assertUnreachable(_x: never): never {
 
 export abstract class Plugin {
   static getParentOfNode(node: Node): Node | null {
-    const { parent } = Deno.core.jsonOpSync("op_get_parent_of_node", { span: node.span });
+    const { parent } = Deno.core.jsonOpSync("op_get_parent_of_node", {
+      span: node.span,
+    });
     return parent;
   }
 
   static getChildrenOfNode(node: Node): ReadonlyArray<Node> {
-    const { children } = Deno.core.jsonOpSync("op_get_children_of_node", { span: node.span });
+    const { children } = Deno.core.jsonOpSync("op_get_children_of_node", {
+      span: node.span,
+    });
     return children;
   }
 

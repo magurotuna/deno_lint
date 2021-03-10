@@ -61,6 +61,7 @@ import {
   MemberExpr,
   MetaPropExpr,
   MethodProp,
+  Module,
   NamedExport,
   NewExpr,
   Null,
@@ -76,6 +77,7 @@ import {
   Regex,
   RestPat,
   ReturnStmt,
+  Script,
   SeqExpr,
   SetterProp,
   SpreadElement,
@@ -137,8 +139,6 @@ import {
   WhileStmt,
   WithStmt,
   YieldExpr,
-  Module,
-  Script,
 } from "./ast.ts";
 
 export type Program = Module | Script;
