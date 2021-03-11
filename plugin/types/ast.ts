@@ -1,5 +1,5 @@
-import { HasSpan, Span, Traverse } from "./common.ts";
-import {
+import type { HasSpan, Span, Traverse } from "./common.ts";
+import type {
   Accessibility,
   AssignOp,
   BinaryOp,
