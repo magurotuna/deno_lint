@@ -1,3 +1,4 @@
+import { Context } from "./context.ts";
 import type { Node } from "./types/common.ts";
 import type { Program } from "./types/enum.ts";
 import type {
@@ -168,684 +169,672 @@ function assertUnreachable(_x: never): never {
 }
 
 export abstract class Plugin {
-  static getParentOfNode(node: Node): Node | null {
-    const { parent } = Deno.core.jsonOpSync("op_get_parent_of_node", {
-      span: node.span,
-    });
-    return parent;
-  }
-
-  static getChildrenOfNode(node: Node): ReadonlyArray<Node> {
-    const { children } = Deno.core.jsonOpSync("op_get_children_of_node", {
-      span: node.span,
-    });
-    return children;
-  }
-
   ////////////////////////////////////////////
   // handlers
   //
   // plugin writers may override whichever methods they want to.
   ////////////////////////////////////////////
 
-  arrayLit(_n: ArrayLit) {}
-  arrayPat(_n: ArrayPat) {}
-  arrowExpr(_n: ArrowExpr) {}
-  assignExpr(_n: AssignExpr) {}
-  assignPat(_n: AssignPat) {}
-  assignPatProp(_n: AssignPatProp) {}
-  assignProp(_n: AssignProp) {}
-  awaitExpr(_n: AwaitExpr) {}
-  bigInt_(_n: BigInt_) {}
-  binExpr(_n: BinExpr) {}
-  bindingIdent(_n: BindingIdent) {}
-  blockStmt(_n: BlockStmt) {}
-  bool(_n: Bool) {}
-  breakStmt(_n: BreakStmt) {}
-  callExpr(_n: CallExpr) {}
-  catchClause(_n: CatchClause) {}
-  class(_n: Class) {}
-  classDecl(_n: ClassDecl) {}
-  classExpr(_n: ClassExpr) {}
-  classMethod(_n: ClassMethod) {}
-  classProp(_n: ClassProp) {}
-  computedPropName(_n: ComputedPropName) {}
-  condExpr(_n: CondExpr) {}
-  constructor(_n: Constructor) {}
-  continueStmt(_n: ContinueStmt) {}
-  debuggerStmt(_n: DebuggerStmt) {}
-  decorator(_n: Decorator) {}
-  doWhileStmt(_n: DoWhileStmt) {}
-  emptyStmt(_n: EmptyStmt) {}
-  exportAll(_n: ExportAll) {}
-  exportDecl(_n: ExportDecl) {}
-  exportDefaultDecl(_n: ExportDefaultDecl) {}
-  exportDefaultExpr(_n: ExportDefaultExpr) {}
-  exportDefaultSpecifier(_n: ExportDefaultSpecifier) {}
-  exportNamedSpecifier(_n: ExportNamedSpecifier) {}
-  exportNamespaceSpecifier(_n: ExportNamespaceSpecifier) {}
-  exprOrSpread(_n: ExprOrSpread) {}
-  exprStmt(_n: ExprStmt) {}
-  fnDecl(_n: FnDecl) {}
-  fnExpr(_n: FnExpr) {}
-  forInStmt(_n: ForInStmt) {}
-  forOfStmt(_n: ForOfStmt) {}
-  forStmt(_n: ForStmt) {}
-  function_(_n: Function_) {}
-  getterProp(_n: GetterProp) {}
-  ident(_n: Ident) {}
-  ifStmt(_n: IfStmt) {}
-  importDecl(_n: ImportDecl) {}
-  importDefaultSpecifier(_n: ImportDefaultSpecifier) {}
-  importNamedSpecifier(_n: ImportNamedSpecifier) {}
-  importStarAsSpecifier(_n: ImportStarAsSpecifier) {}
-  invalid(_n: Invalid) {}
-  JSXAttr(_n: JSXAttr) {}
-  JSXClosingElement(_n: JSXClosingElement) {}
-  JSXClosingFragment(_n: JSXClosingFragment) {}
-  JSXElement(_n: JSXElement) {}
-  JSXEmptyExpr(_n: JSXEmptyExpr) {}
-  JSXExprContainer(_n: JSXExprContainer) {}
-  JSXFragment(_n: JSXFragment) {}
-  JSXMemberExpr(_n: JSXMemberExpr) {}
-  JSXNamespacedName(_n: JSXNamespacedName) {}
-  JSXOpeningElement(_n: JSXOpeningElement) {}
-  JSXOpeningFragment(_n: JSXOpeningFragment) {}
-  JSXSpreadChild(_n: JSXSpreadChild) {}
-  JSXText(_n: JSXText) {}
-  keyValuePatProp(_n: KeyValuePatProp) {}
-  keyValueProp(_n: KeyValueProp) {}
-  labeledStmt(_n: LabeledStmt) {}
-  memberExpr(_n: MemberExpr) {}
-  metaPropExpr(_n: MetaPropExpr) {}
-  methodProp(_n: MethodProp) {}
-  module(_n: Module) {}
-  namedExport(_n: NamedExport) {}
-  newExpr(_n: NewExpr) {}
-  null(_n: Null) {}
-  number_(_n: Number_) {}
-  objectLit(_n: ObjectLit) {}
-  objectPat(_n: ObjectPat) {}
-  optChainExpr(_n: OptChainExpr) {}
-  param(_n: Param) {}
-  parenExpr(_n: ParenExpr) {}
-  privateMethod(_n: PrivateMethod) {}
-  privateName(_n: PrivateName) {}
-  privateProp(_n: PrivateProp) {}
-  regex(_n: Regex) {}
-  restPat(_n: RestPat) {}
-  returnStmt(_n: ReturnStmt) {}
-  script(_n: Script) {}
-  seqExpr(_n: SeqExpr) {}
-  setterProp(_n: SetterProp) {}
-  spreadElement(_n: SpreadElement) {}
-  str(_n: Str) {}
-  super(_n: Super) {}
-  switchCase(_n: SwitchCase) {}
-  switchStmt(_n: SwitchStmt) {}
-  taggedTpl(_n: TaggedTpl) {}
-  thisExpr(_n: ThisExpr) {}
-  throwStmt(_n: ThrowStmt) {}
-  tpl(_n: Tpl) {}
-  tplElement(_n: TplElement) {}
-  tryStmt(_n: TryStmt) {}
-  tsArrayType(_n: TsArrayType) {}
-  tsAsExpr(_n: TsAsExpr) {}
-  tsCallSignatureDecl(_n: TsCallSignatureDecl) {}
-  tsConditionalType(_n: TsConditionalType) {}
-  tsConstAssertion(_n: TsConstAssertion) {}
-  tsConstructSignatureDecl(_n: TsConstructSignatureDecl) {}
-  tsConstructorType(_n: TsConstructorType) {}
-  tsEnumDecl(_n: TsEnumDecl) {}
-  tsEnumMember(_n: TsEnumMember) {}
-  tsExportAssignment(_n: TsExportAssignment) {}
-  tsExprWithTypeArgs(_n: TsExprWithTypeArgs) {}
-  tsExternalModuleRef(_n: TsExternalModuleRef) {}
-  tsFnType(_n: TsFnType) {}
-  tsImportEqualsDecl(_n: TsImportEqualsDecl) {}
-  tsImportType(_n: TsImportType) {}
-  tsIndexSignature(_n: TsIndexSignature) {}
-  tsIndexedAccessType(_n: TsIndexedAccessType) {}
-  tsInferType(_n: TsInferType) {}
-  tsInterfaceBody(_n: TsInterfaceBody) {}
-  tsInterfaceDecl(_n: TsInterfaceDecl) {}
-  tsIntersectionType(_n: TsIntersectionType) {}
-  tsKeywordType(_n: TsKeywordType) {}
-  tsLitType(_n: TsLitType) {}
-  tsMappedType(_n: TsMappedType) {}
-  tsMethodSignature(_n: TsMethodSignature) {}
-  tsModuleBlock(_n: TsModuleBlock) {}
-  tsModuleDecl(_n: TsModuleDecl) {}
-  tsNamespaceDecl(_n: TsNamespaceDecl) {}
-  tsNamespaceExportDecl(_n: TsNamespaceExportDecl) {}
-  tsNonNullExpr(_n: TsNonNullExpr) {}
-  tsOptionalType(_n: TsOptionalType) {}
-  tsParamProp(_n: TsParamProp) {}
-  tsParenthesizedType(_n: TsParenthesizedType) {}
-  tsPropertySignature(_n: TsPropertySignature) {}
-  tsQualifiedName(_n: TsQualifiedName) {}
-  tsRestType(_n: TsRestType) {}
-  tsThisType(_n: TsThisType) {}
-  tsTplLitType(_n: TsTplLitType) {}
-  tsTupleElement(_n: TsTupleElement) {}
-  tsTupleType(_n: TsTupleType) {}
-  tsTypeAliasDecl(_n: TsTypeAliasDecl) {}
-  tsTypeAnn(_n: TsTypeAnn) {}
-  tsTypeAssertion(_n: TsTypeAssertion) {}
-  tsTypeLit(_n: TsTypeLit) {}
-  tsTypeOperator(_n: TsTypeOperator) {}
-  tsTypeParam(_n: TsTypeParam) {}
-  tsTypeParamDecl(_n: TsTypeParamDecl) {}
-  tsTypeParamInstantiation(_n: TsTypeParamInstantiation) {}
-  tsTypePredicate(_n: TsTypePredicate) {}
-  tsTypeQuery(_n: TsTypeQuery) {}
-  tsTypeRef(_n: TsTypeRef) {}
-  tsUnionType(_n: TsUnionType) {}
-  unaryExpr(_n: UnaryExpr) {}
-  updateExpr(_n: UpdateExpr) {}
-  varDecl(_n: VarDecl) {}
-  varDeclarator(_n: VarDeclarator) {}
-  whileStmt(_n: WhileStmt) {}
-  withStmt(_n: WithStmt) {}
-  yieldExpr(_n: YieldExpr) {}
+  arrayLit(_n: ArrayLit, _ctx: Context) {}
+  arrayPat(_n: ArrayPat, _ctx: Context) {}
+  arrowExpr(_n: ArrowExpr, _ctx: Context) {}
+  assignExpr(_n: AssignExpr, _ctx: Context) {}
+  assignPat(_n: AssignPat, _ctx: Context) {}
+  assignPatProp(_n: AssignPatProp, _ctx: Context) {}
+  assignProp(_n: AssignProp, _ctx: Context) {}
+  awaitExpr(_n: AwaitExpr, _ctx: Context) {}
+  bigInt_(_n: BigInt_, _ctx: Context) {}
+  binExpr(_n: BinExpr, _ctx: Context) {}
+  bindingIdent(_n: BindingIdent, _ctx: Context) {}
+  blockStmt(_n: BlockStmt, _ctx: Context) {}
+  bool(_n: Bool, _ctx: Context) {}
+  breakStmt(_n: BreakStmt, _ctx: Context) {}
+  callExpr(_n: CallExpr, _ctx: Context) {}
+  catchClause(_n: CatchClause, _ctx: Context) {}
+  class(_n: Class, _ctx: Context) {}
+  classDecl(_n: ClassDecl, _ctx: Context) {}
+  classExpr(_n: ClassExpr, _ctx: Context) {}
+  classMethod(_n: ClassMethod, _ctx: Context) {}
+  classProp(_n: ClassProp, _ctx: Context) {}
+  computedPropName(_n: ComputedPropName, _ctx: Context) {}
+  condExpr(_n: CondExpr, _ctx: Context) {}
+  constructor_(_n: Constructor, _ctx: Context) {}
+  continueStmt(_n: ContinueStmt, _ctx: Context) {}
+  debuggerStmt(_n: DebuggerStmt, _ctx: Context) {}
+  decorator(_n: Decorator, _ctx: Context) {}
+  doWhileStmt(_n: DoWhileStmt, _ctx: Context) {}
+  emptyStmt(_n: EmptyStmt, _ctx: Context) {}
+  exportAll(_n: ExportAll, _ctx: Context) {}
+  exportDecl(_n: ExportDecl, _ctx: Context) {}
+  exportDefaultDecl(_n: ExportDefaultDecl, _ctx: Context) {}
+  exportDefaultExpr(_n: ExportDefaultExpr, _ctx: Context) {}
+  exportDefaultSpecifier(_n: ExportDefaultSpecifier, _ctx: Context) {}
+  exportNamedSpecifier(_n: ExportNamedSpecifier, _ctx: Context) {}
+  exportNamespaceSpecifier(_n: ExportNamespaceSpecifier, _ctx: Context) {}
+  exprOrSpread(_n: ExprOrSpread, _ctx: Context) {}
+  exprStmt(_n: ExprStmt, _ctx: Context) {}
+  fnDecl(_n: FnDecl, _ctx: Context) {}
+  fnExpr(_n: FnExpr, _ctx: Context) {}
+  forInStmt(_n: ForInStmt, _ctx: Context) {}
+  forOfStmt(_n: ForOfStmt, _ctx: Context) {}
+  forStmt(_n: ForStmt, _ctx: Context) {}
+  function_(_n: Function_, _ctx: Context) {}
+  getterProp(_n: GetterProp, _ctx: Context) {}
+  ident(_n: Ident, _ctx: Context) {}
+  ifStmt(_n: IfStmt, _ctx: Context) {}
+  importDecl(_n: ImportDecl, _ctx: Context) {}
+  importDefaultSpecifier(_n: ImportDefaultSpecifier, _ctx: Context) {}
+  importNamedSpecifier(_n: ImportNamedSpecifier, _ctx: Context) {}
+  importStarAsSpecifier(_n: ImportStarAsSpecifier, _ctx: Context) {}
+  invalid(_n: Invalid, _ctx: Context) {}
+  JSXAttr(_n: JSXAttr, _ctx: Context) {}
+  JSXClosingElement(_n: JSXClosingElement, _ctx: Context) {}
+  JSXClosingFragment(_n: JSXClosingFragment, _ctx: Context) {}
+  JSXElement(_n: JSXElement, _ctx: Context) {}
+  JSXEmptyExpr(_n: JSXEmptyExpr, _ctx: Context) {}
+  JSXExprContainer(_n: JSXExprContainer, _ctx: Context) {}
+  JSXFragment(_n: JSXFragment, _ctx: Context) {}
+  JSXMemberExpr(_n: JSXMemberExpr, _ctx: Context) {}
+  JSXNamespacedName(_n: JSXNamespacedName, _ctx: Context) {}
+  JSXOpeningElement(_n: JSXOpeningElement, _ctx: Context) {}
+  JSXOpeningFragment(_n: JSXOpeningFragment, _ctx: Context) {}
+  JSXSpreadChild(_n: JSXSpreadChild, _ctx: Context) {}
+  JSXText(_n: JSXText, _ctx: Context) {}
+  keyValuePatProp(_n: KeyValuePatProp, _ctx: Context) {}
+  keyValueProp(_n: KeyValueProp, _ctx: Context) {}
+  labeledStmt(_n: LabeledStmt, _ctx: Context) {}
+  memberExpr(_n: MemberExpr, _ctx: Context) {}
+  metaPropExpr(_n: MetaPropExpr, _ctx: Context) {}
+  methodProp(_n: MethodProp, _ctx: Context) {}
+  module(_n: Module, _ctx: Context) {}
+  namedExport(_n: NamedExport, _ctx: Context) {}
+  newExpr(_n: NewExpr, _ctx: Context) {}
+  null(_n: Null, _ctx: Context) {}
+  number_(_n: Number_, _ctx: Context) {}
+  objectLit(_n: ObjectLit, _ctx: Context) {}
+  objectPat(_n: ObjectPat, _ctx: Context) {}
+  optChainExpr(_n: OptChainExpr, _ctx: Context) {}
+  param(_n: Param, _ctx: Context) {}
+  parenExpr(_n: ParenExpr, _ctx: Context) {}
+  privateMethod(_n: PrivateMethod, _ctx: Context) {}
+  privateName(_n: PrivateName, _ctx: Context) {}
+  privateProp(_n: PrivateProp, _ctx: Context) {}
+  regex(_n: Regex, _ctx: Context) {}
+  restPat(_n: RestPat, _ctx: Context) {}
+  returnStmt(_n: ReturnStmt, _ctx: Context) {}
+  script(_n: Script, _ctx: Context) {}
+  seqExpr(_n: SeqExpr, _ctx: Context) {}
+  setterProp(_n: SetterProp, _ctx: Context) {}
+  spreadElement(_n: SpreadElement, _ctx: Context) {}
+  str(_n: Str, _ctx: Context) {}
+  super(_n: Super, _ctx: Context) {}
+  switchCase(_n: SwitchCase, _ctx: Context) {}
+  switchStmt(_n: SwitchStmt, _ctx: Context) {}
+  taggedTpl(_n: TaggedTpl, _ctx: Context) {}
+  thisExpr(_n: ThisExpr, _ctx: Context) {}
+  throwStmt(_n: ThrowStmt, _ctx: Context) {}
+  tpl(_n: Tpl, _ctx: Context) {}
+  tplElement(_n: TplElement, _ctx: Context) {}
+  tryStmt(_n: TryStmt, _ctx: Context) {}
+  tsArrayType(_n: TsArrayType, _ctx: Context) {}
+  tsAsExpr(_n: TsAsExpr, _ctx: Context) {}
+  tsCallSignatureDecl(_n: TsCallSignatureDecl, _ctx: Context) {}
+  tsConditionalType(_n: TsConditionalType, _ctx: Context) {}
+  tsConstAssertion(_n: TsConstAssertion, _ctx: Context) {}
+  tsConstructSignatureDecl(_n: TsConstructSignatureDecl, _ctx: Context) {}
+  tsConstructorType(_n: TsConstructorType, _ctx: Context) {}
+  tsEnumDecl(_n: TsEnumDecl, _ctx: Context) {}
+  tsEnumMember(_n: TsEnumMember, _ctx: Context) {}
+  tsExportAssignment(_n: TsExportAssignment, _ctx: Context) {}
+  tsExprWithTypeArgs(_n: TsExprWithTypeArgs, _ctx: Context) {}
+  tsExternalModuleRef(_n: TsExternalModuleRef, _ctx: Context) {}
+  tsFnType(_n: TsFnType, _ctx: Context) {}
+  tsImportEqualsDecl(_n: TsImportEqualsDecl, _ctx: Context) {}
+  tsImportType(_n: TsImportType, _ctx: Context) {}
+  tsIndexSignature(_n: TsIndexSignature, _ctx: Context) {}
+  tsIndexedAccessType(_n: TsIndexedAccessType, _ctx: Context) {}
+  tsInferType(_n: TsInferType, _ctx: Context) {}
+  tsInterfaceBody(_n: TsInterfaceBody, _ctx: Context) {}
+  tsInterfaceDecl(_n: TsInterfaceDecl, _ctx: Context) {}
+  tsIntersectionType(_n: TsIntersectionType, _ctx: Context) {}
+  tsKeywordType(_n: TsKeywordType, _ctx: Context) {}
+  tsLitType(_n: TsLitType, _ctx: Context) {}
+  tsMappedType(_n: TsMappedType, _ctx: Context) {}
+  tsMethodSignature(_n: TsMethodSignature, _ctx: Context) {}
+  tsModuleBlock(_n: TsModuleBlock, _ctx: Context) {}
+  tsModuleDecl(_n: TsModuleDecl, _ctx: Context) {}
+  tsNamespaceDecl(_n: TsNamespaceDecl, _ctx: Context) {}
+  tsNamespaceExportDecl(_n: TsNamespaceExportDecl, _ctx: Context) {}
+  tsNonNullExpr(_n: TsNonNullExpr, _ctx: Context) {}
+  tsOptionalType(_n: TsOptionalType, _ctx: Context) {}
+  tsParamProp(_n: TsParamProp, _ctx: Context) {}
+  tsParenthesizedType(_n: TsParenthesizedType, _ctx: Context) {}
+  tsPropertySignature(_n: TsPropertySignature, _ctx: Context) {}
+  tsQualifiedName(_n: TsQualifiedName, _ctx: Context) {}
+  tsRestType(_n: TsRestType, _ctx: Context) {}
+  tsThisType(_n: TsThisType, _ctx: Context) {}
+  tsTplLitType(_n: TsTplLitType, _ctx: Context) {}
+  tsTupleElement(_n: TsTupleElement, _ctx: Context) {}
+  tsTupleType(_n: TsTupleType, _ctx: Context) {}
+  tsTypeAliasDecl(_n: TsTypeAliasDecl, _ctx: Context) {}
+  tsTypeAnn(_n: TsTypeAnn, _ctx: Context) {}
+  tsTypeAssertion(_n: TsTypeAssertion, _ctx: Context) {}
+  tsTypeLit(_n: TsTypeLit, _ctx: Context) {}
+  tsTypeOperator(_n: TsTypeOperator, _ctx: Context) {}
+  tsTypeParam(_n: TsTypeParam, _ctx: Context) {}
+  tsTypeParamDecl(_n: TsTypeParamDecl, _ctx: Context) {}
+  tsTypeParamInstantiation(_n: TsTypeParamInstantiation, _ctx: Context) {}
+  tsTypePredicate(_n: TsTypePredicate, _ctx: Context) {}
+  tsTypeQuery(_n: TsTypeQuery, _ctx: Context) {}
+  tsTypeRef(_n: TsTypeRef, _ctx: Context) {}
+  tsUnionType(_n: TsUnionType, _ctx: Context) {}
+  unaryExpr(_n: UnaryExpr, _ctx: Context) {}
+  updateExpr(_n: UpdateExpr, _ctx: Context) {}
+  varDecl(_n: VarDecl, _ctx: Context) {}
+  varDeclarator(_n: VarDeclarator, _ctx: Context) {}
+  whileStmt(_n: WhileStmt, _ctx: Context) {}
+  withStmt(_n: WithStmt, _ctx: Context) {}
+  yieldExpr(_n: YieldExpr, _ctx: Context) {}
 
   ////////////////////////////////////////////
   // internal methods
   ////////////////////////////////////////////
 
-  private __traverse(currentNode: Node) {
+  constructor(private __ctx: Context) {}
+
+  private __traverse(currentNode: Node, ctx: Context) {
     switch (currentNode.nodeKind) {
       case "ArrayLit":
-        this.arrayLit(currentNode);
+        this.arrayLit(currentNode, ctx);
         break;
       case "ArrayPat":
-        this.arrayPat(currentNode);
+        this.arrayPat(currentNode, ctx);
         break;
       case "ArrowExpr":
-        this.arrowExpr(currentNode);
+        this.arrowExpr(currentNode, ctx);
         break;
       case "AssignExpr":
-        this.assignExpr(currentNode);
+        this.assignExpr(currentNode, ctx);
         break;
       case "AssignPat":
-        this.assignPat(currentNode);
+        this.assignPat(currentNode, ctx);
         break;
       case "AssignPatProp":
-        this.assignPatProp(currentNode);
+        this.assignPatProp(currentNode, ctx);
         break;
       case "AssignProp":
-        this.assignProp(currentNode);
+        this.assignProp(currentNode, ctx);
         break;
       case "AwaitExpr":
-        this.awaitExpr(currentNode);
+        this.awaitExpr(currentNode, ctx);
         break;
       case "BigInt":
-        this.bigInt_(currentNode);
+        this.bigInt_(currentNode, ctx);
         break;
       case "BinExpr":
-        this.binExpr(currentNode);
+        this.binExpr(currentNode, ctx);
         break;
       case "BindingIdent":
-        this.bindingIdent(currentNode);
+        this.bindingIdent(currentNode, ctx);
         break;
       case "BlockStmt":
-        this.blockStmt(currentNode);
+        this.blockStmt(currentNode, ctx);
         break;
       case "Bool":
-        this.bool(currentNode);
+        this.bool(currentNode, ctx);
         break;
       case "BreakStmt":
-        this.breakStmt(currentNode);
+        this.breakStmt(currentNode, ctx);
         break;
       case "CallExpr":
-        this.callExpr(currentNode);
+        this.callExpr(currentNode, ctx);
         break;
       case "CatchClause":
-        this.catchClause(currentNode);
+        this.catchClause(currentNode, ctx);
         break;
       case "Class":
-        this.class(currentNode);
+        this.class(currentNode, ctx);
         break;
       case "ClassDecl":
-        this.classDecl(currentNode);
+        this.classDecl(currentNode, ctx);
         break;
       case "ClassExpr":
-        this.classExpr(currentNode);
+        this.classExpr(currentNode, ctx);
         break;
       case "ClassMethod":
-        this.classMethod(currentNode);
+        this.classMethod(currentNode, ctx);
         break;
       case "ClassProp":
-        this.classProp(currentNode);
+        this.classProp(currentNode, ctx);
         break;
       case "ComputedPropName":
-        this.computedPropName(currentNode);
+        this.computedPropName(currentNode, ctx);
         break;
       case "CondExpr":
-        this.condExpr(currentNode);
+        this.condExpr(currentNode, ctx);
         break;
       case "Constructor":
-        this.constructor(currentNode);
+        this.constructor_(currentNode, ctx);
         break;
       case "ContinueStmt":
-        this.continueStmt(currentNode);
+        this.continueStmt(currentNode, ctx);
         break;
       case "DebuggerStmt":
-        this.debuggerStmt(currentNode);
+        this.debuggerStmt(currentNode, ctx);
         break;
       case "Decorator":
-        this.decorator(currentNode);
+        this.decorator(currentNode, ctx);
         break;
       case "DoWhileStmt":
-        this.doWhileStmt(currentNode);
+        this.doWhileStmt(currentNode, ctx);
         break;
       case "EmptyStmt":
-        this.emptyStmt(currentNode);
+        this.emptyStmt(currentNode, ctx);
         break;
       case "ExportAll":
-        this.exportAll(currentNode);
+        this.exportAll(currentNode, ctx);
         break;
       case "ExportDecl":
-        this.exportDecl(currentNode);
+        this.exportDecl(currentNode, ctx);
         break;
       case "ExportDefaultDecl":
-        this.exportDefaultDecl(currentNode);
+        this.exportDefaultDecl(currentNode, ctx);
         break;
       case "ExportDefaultExpr":
-        this.exportDefaultExpr(currentNode);
+        this.exportDefaultExpr(currentNode, ctx);
         break;
       case "ExportDefaultSpecifier":
-        this.exportDefaultSpecifier(currentNode);
+        this.exportDefaultSpecifier(currentNode, ctx);
         break;
       case "ExportNamedSpecifier":
-        this.exportNamedSpecifier(currentNode);
+        this.exportNamedSpecifier(currentNode, ctx);
         break;
       case "ExportNamespaceSpecifier":
-        this.exportNamespaceSpecifier(currentNode);
+        this.exportNamespaceSpecifier(currentNode, ctx);
         break;
       case "ExprOrSpread":
-        this.exprOrSpread(currentNode);
+        this.exprOrSpread(currentNode, ctx);
         break;
       case "ExprStmt":
-        this.exprStmt(currentNode);
+        this.exprStmt(currentNode, ctx);
         break;
       case "FnDecl":
-        this.fnDecl(currentNode);
+        this.fnDecl(currentNode, ctx);
         break;
       case "FnExpr":
-        this.fnExpr(currentNode);
+        this.fnExpr(currentNode, ctx);
         break;
       case "ForInStmt":
-        this.forInStmt(currentNode);
+        this.forInStmt(currentNode, ctx);
         break;
       case "ForOfStmt":
-        this.forOfStmt(currentNode);
+        this.forOfStmt(currentNode, ctx);
         break;
       case "ForStmt":
-        this.forStmt(currentNode);
+        this.forStmt(currentNode, ctx);
         break;
       case "Function":
-        this.function_(currentNode);
+        this.function_(currentNode, ctx);
         break;
       case "GetterProp":
-        this.getterProp(currentNode);
+        this.getterProp(currentNode, ctx);
         break;
       case "Ident":
-        this.ident(currentNode);
+        this.ident(currentNode, ctx);
         break;
       case "IfStmt":
-        this.ifStmt(currentNode);
+        this.ifStmt(currentNode, ctx);
         break;
       case "ImportDecl":
-        this.importDecl(currentNode);
+        this.importDecl(currentNode, ctx);
         break;
       case "ImportDefaultSpecifier":
-        this.importDefaultSpecifier(currentNode);
+        this.importDefaultSpecifier(currentNode, ctx);
         break;
       case "ImportNamedSpecifier":
-        this.importNamedSpecifier(currentNode);
+        this.importNamedSpecifier(currentNode, ctx);
         break;
       case "ImportStarAsSpecifier":
-        this.importStarAsSpecifier(currentNode);
+        this.importStarAsSpecifier(currentNode, ctx);
         break;
       case "Invalid":
-        this.invalid(currentNode);
+        this.invalid(currentNode, ctx);
         break;
       case "JSXAttr":
-        this.JSXAttr(currentNode);
+        this.JSXAttr(currentNode, ctx);
         break;
       case "JSXClosingElement":
-        this.JSXClosingElement(currentNode);
+        this.JSXClosingElement(currentNode, ctx);
         break;
       case "JSXClosingFragment":
-        this.JSXClosingFragment(currentNode);
+        this.JSXClosingFragment(currentNode, ctx);
         break;
       case "JSXElement":
-        this.JSXElement(currentNode);
+        this.JSXElement(currentNode, ctx);
         break;
       case "JSXEmptyExpr":
-        this.JSXEmptyExpr(currentNode);
+        this.JSXEmptyExpr(currentNode, ctx);
         break;
       case "JSXExprContainer":
-        this.JSXExprContainer(currentNode);
+        this.JSXExprContainer(currentNode, ctx);
         break;
       case "JSXFragment":
-        this.JSXFragment(currentNode);
+        this.JSXFragment(currentNode, ctx);
         break;
       case "JSXMemberExpr":
-        this.JSXMemberExpr(currentNode);
+        this.JSXMemberExpr(currentNode, ctx);
         break;
       case "JSXNamespacedName":
-        this.JSXNamespacedName(currentNode);
+        this.JSXNamespacedName(currentNode, ctx);
         break;
       case "JSXOpeningElement":
-        this.JSXOpeningElement(currentNode);
+        this.JSXOpeningElement(currentNode, ctx);
         break;
       case "JSXOpeningFragment":
-        this.JSXOpeningFragment(currentNode);
+        this.JSXOpeningFragment(currentNode, ctx);
         break;
       case "JSXSpreadChild":
-        this.JSXSpreadChild(currentNode);
+        this.JSXSpreadChild(currentNode, ctx);
         break;
       case "JSXText":
-        this.JSXText(currentNode);
+        this.JSXText(currentNode, ctx);
         break;
       case "KeyValuePatProp":
-        this.keyValuePatProp(currentNode);
+        this.keyValuePatProp(currentNode, ctx);
         break;
       case "KeyValueProp":
-        this.keyValueProp(currentNode);
+        this.keyValueProp(currentNode, ctx);
         break;
       case "LabeledStmt":
-        this.labeledStmt(currentNode);
+        this.labeledStmt(currentNode, ctx);
         break;
       case "MemberExpr":
-        this.memberExpr(currentNode);
+        this.memberExpr(currentNode, ctx);
         break;
       case "MetaPropExpr":
-        this.metaPropExpr(currentNode);
+        this.metaPropExpr(currentNode, ctx);
         break;
       case "MethodProp":
-        this.methodProp(currentNode);
+        this.methodProp(currentNode, ctx);
         break;
       case "Module":
-        this.module(currentNode);
+        this.module(currentNode, ctx);
         break;
       case "NamedExport":
-        this.namedExport(currentNode);
+        this.namedExport(currentNode, ctx);
         break;
       case "NewExpr":
-        this.newExpr(currentNode);
+        this.newExpr(currentNode, ctx);
         break;
       case "Null":
-        this.null(currentNode);
+        this.null(currentNode, ctx);
         break;
       case "Number":
-        this.number_(currentNode);
+        this.number_(currentNode, ctx);
         break;
       case "ObjectLit":
-        this.objectLit(currentNode);
+        this.objectLit(currentNode, ctx);
         break;
       case "ObjectPat":
-        this.objectPat(currentNode);
+        this.objectPat(currentNode, ctx);
         break;
       case "OptChainExpr":
-        this.optChainExpr(currentNode);
+        this.optChainExpr(currentNode, ctx);
         break;
       case "Param":
-        this.param(currentNode);
+        this.param(currentNode, ctx);
         break;
       case "ParenExpr":
-        this.parenExpr(currentNode);
+        this.parenExpr(currentNode, ctx);
         break;
       case "PrivateMethod":
-        this.privateMethod(currentNode);
+        this.privateMethod(currentNode, ctx);
         break;
       case "PrivateName":
-        this.privateName(currentNode);
+        this.privateName(currentNode, ctx);
         break;
       case "PrivateProp":
-        this.privateProp(currentNode);
+        this.privateProp(currentNode, ctx);
         break;
       case "Regex":
-        this.regex(currentNode);
+        this.regex(currentNode, ctx);
         break;
       case "RestPat":
-        this.restPat(currentNode);
+        this.restPat(currentNode, ctx);
         break;
       case "ReturnStmt":
-        this.returnStmt(currentNode);
+        this.returnStmt(currentNode, ctx);
         break;
       case "Script":
-        this.script(currentNode);
+        this.script(currentNode, ctx);
         break;
       case "SeqExpr":
-        this.seqExpr(currentNode);
+        this.seqExpr(currentNode, ctx);
         break;
       case "SetterProp":
-        this.setterProp(currentNode);
+        this.setterProp(currentNode, ctx);
         break;
       case "SpreadElement":
-        this.spreadElement(currentNode);
+        this.spreadElement(currentNode, ctx);
         break;
       case "Str":
-        this.str(currentNode);
+        this.str(currentNode, ctx);
         break;
       case "Super":
-        this.super(currentNode);
+        this.super(currentNode, ctx);
         break;
       case "SwitchCase":
-        this.switchCase(currentNode);
+        this.switchCase(currentNode, ctx);
         break;
       case "SwitchStmt":
-        this.switchStmt(currentNode);
+        this.switchStmt(currentNode, ctx);
         break;
       case "TaggedTpl":
-        this.taggedTpl(currentNode);
+        this.taggedTpl(currentNode, ctx);
         break;
       case "ThisExpr":
-        this.thisExpr(currentNode);
+        this.thisExpr(currentNode, ctx);
         break;
       case "ThrowStmt":
-        this.throwStmt(currentNode);
+        this.throwStmt(currentNode, ctx);
         break;
       case "Tpl":
-        this.tpl(currentNode);
+        this.tpl(currentNode, ctx);
         break;
       case "TplElement":
-        this.tplElement(currentNode);
+        this.tplElement(currentNode, ctx);
         break;
       case "TryStmt":
-        this.tryStmt(currentNode);
+        this.tryStmt(currentNode, ctx);
         break;
       case "TsArrayType":
-        this.tsArrayType(currentNode);
+        this.tsArrayType(currentNode, ctx);
         break;
       case "TsAsExpr":
-        this.tsAsExpr(currentNode);
+        this.tsAsExpr(currentNode, ctx);
         break;
       case "TsCallSignatureDecl":
-        this.tsCallSignatureDecl(currentNode);
+        this.tsCallSignatureDecl(currentNode, ctx);
         break;
       case "TsConditionalType":
-        this.tsConditionalType(currentNode);
+        this.tsConditionalType(currentNode, ctx);
         break;
       case "TsConstAssertion":
-        this.tsConstAssertion(currentNode);
+        this.tsConstAssertion(currentNode, ctx);
         break;
       case "TsConstructSignatureDecl":
-        this.tsConstructSignatureDecl(currentNode);
+        this.tsConstructSignatureDecl(currentNode, ctx);
         break;
       case "TsConstructorType":
-        this.tsConstructorType(currentNode);
+        this.tsConstructorType(currentNode, ctx);
         break;
       case "TsEnumDecl":
-        this.tsEnumDecl(currentNode);
+        this.tsEnumDecl(currentNode, ctx);
         break;
       case "TsEnumMember":
-        this.tsEnumMember(currentNode);
+        this.tsEnumMember(currentNode, ctx);
         break;
       case "TsExportAssignment":
-        this.tsExportAssignment(currentNode);
+        this.tsExportAssignment(currentNode, ctx);
         break;
       case "TsExprWithTypeArgs":
-        this.tsExprWithTypeArgs(currentNode);
+        this.tsExprWithTypeArgs(currentNode, ctx);
         break;
       case "TsExternalModuleRef":
-        this.tsExternalModuleRef(currentNode);
+        this.tsExternalModuleRef(currentNode, ctx);
         break;
       case "TsFnType":
-        this.tsFnType(currentNode);
+        this.tsFnType(currentNode, ctx);
         break;
       case "TsImportEqualsDecl":
-        this.tsImportEqualsDecl(currentNode);
+        this.tsImportEqualsDecl(currentNode, ctx);
         break;
       case "TsImportType":
-        this.tsImportType(currentNode);
+        this.tsImportType(currentNode, ctx);
         break;
       case "TsIndexSignature":
-        this.tsIndexSignature(currentNode);
+        this.tsIndexSignature(currentNode, ctx);
         break;
       case "TsIndexedAccessType":
-        this.tsIndexedAccessType(currentNode);
+        this.tsIndexedAccessType(currentNode, ctx);
         break;
       case "TsInferType":
-        this.tsInferType(currentNode);
+        this.tsInferType(currentNode, ctx);
         break;
       case "TsInterfaceBody":
-        this.tsInterfaceBody(currentNode);
+        this.tsInterfaceBody(currentNode, ctx);
         break;
       case "TsInterfaceDecl":
-        this.tsInterfaceDecl(currentNode);
+        this.tsInterfaceDecl(currentNode, ctx);
         break;
       case "TsIntersectionType":
-        this.tsIntersectionType(currentNode);
+        this.tsIntersectionType(currentNode, ctx);
         break;
       case "TsKeywordType":
-        this.tsKeywordType(currentNode);
+        this.tsKeywordType(currentNode, ctx);
         break;
       case "TsLitType":
-        this.tsLitType(currentNode);
+        this.tsLitType(currentNode, ctx);
         break;
       case "TsMappedType":
-        this.tsMappedType(currentNode);
+        this.tsMappedType(currentNode, ctx);
         break;
       case "TsMethodSignature":
-        this.tsMethodSignature(currentNode);
+        this.tsMethodSignature(currentNode, ctx);
         break;
       case "TsModuleBlock":
-        this.tsModuleBlock(currentNode);
+        this.tsModuleBlock(currentNode, ctx);
         break;
       case "TsModuleDecl":
-        this.tsModuleDecl(currentNode);
+        this.tsModuleDecl(currentNode, ctx);
         break;
       case "TsNamespaceDecl":
-        this.tsNamespaceDecl(currentNode);
+        this.tsNamespaceDecl(currentNode, ctx);
         break;
       case "TsNamespaceExportDecl":
-        this.tsNamespaceExportDecl(currentNode);
+        this.tsNamespaceExportDecl(currentNode, ctx);
         break;
       case "TsNonNullExpr":
-        this.tsNonNullExpr(currentNode);
+        this.tsNonNullExpr(currentNode, ctx);
         break;
       case "TsOptionalType":
-        this.tsOptionalType(currentNode);
+        this.tsOptionalType(currentNode, ctx);
         break;
       case "TsParamProp":
-        this.tsParamProp(currentNode);
+        this.tsParamProp(currentNode, ctx);
         break;
       case "TsParenthesizedType":
-        this.tsParenthesizedType(currentNode);
+        this.tsParenthesizedType(currentNode, ctx);
         break;
       case "TsPropertySignature":
-        this.tsPropertySignature(currentNode);
+        this.tsPropertySignature(currentNode, ctx);
         break;
       case "TsQualifiedName":
-        this.tsQualifiedName(currentNode);
+        this.tsQualifiedName(currentNode, ctx);
         break;
       case "TsRestType":
-        this.tsRestType(currentNode);
+        this.tsRestType(currentNode, ctx);
         break;
       case "TsThisType":
-        this.tsThisType(currentNode);
+        this.tsThisType(currentNode, ctx);
         break;
       case "TsTplLitType":
-        this.tsTplLitType(currentNode);
+        this.tsTplLitType(currentNode, ctx);
         break;
       case "TsTupleElement":
-        this.tsTupleElement(currentNode);
+        this.tsTupleElement(currentNode, ctx);
         break;
       case "TsTupleType":
-        this.tsTupleType(currentNode);
+        this.tsTupleType(currentNode, ctx);
         break;
       case "TsTypeAliasDecl":
-        this.tsTypeAliasDecl(currentNode);
+        this.tsTypeAliasDecl(currentNode, ctx);
         break;
       case "TsTypeAnn":
-        this.tsTypeAnn(currentNode);
+        this.tsTypeAnn(currentNode, ctx);
         break;
       case "TsTypeAssertion":
-        this.tsTypeAssertion(currentNode);
+        this.tsTypeAssertion(currentNode, ctx);
         break;
       case "TsTypeLit":
-        this.tsTypeLit(currentNode);
+        this.tsTypeLit(currentNode, ctx);
         break;
       case "TsTypeOperator":
-        this.tsTypeOperator(currentNode);
+        this.tsTypeOperator(currentNode, ctx);
         break;
       case "TsTypeParam":
-        this.tsTypeParam(currentNode);
+        this.tsTypeParam(currentNode, ctx);
         break;
       case "TsTypeParamDecl":
-        this.tsTypeParamDecl(currentNode);
+        this.tsTypeParamDecl(currentNode, ctx);
         break;
       case "TsTypeParamInstantiation":
-        this.tsTypeParamInstantiation(currentNode);
+        this.tsTypeParamInstantiation(currentNode, ctx);
         break;
       case "TsTypePredicate":
-        this.tsTypePredicate(currentNode);
+        this.tsTypePredicate(currentNode, ctx);
         break;
       case "TsTypeQuery":
-        this.tsTypeQuery(currentNode);
+        this.tsTypeQuery(currentNode, ctx);
         break;
       case "TsTypeRef":
-        this.tsTypeRef(currentNode);
+        this.tsTypeRef(currentNode, ctx);
         break;
       case "TsUnionType":
-        this.tsUnionType(currentNode);
+        this.tsUnionType(currentNode, ctx);
         break;
       case "UnaryExpr":
-        this.unaryExpr(currentNode);
+        this.unaryExpr(currentNode, ctx);
         break;
       case "UpdateExpr":
-        this.updateExpr(currentNode);
+        this.updateExpr(currentNode, ctx);
         break;
       case "VarDecl":
-        this.varDecl(currentNode);
+        this.varDecl(currentNode, ctx);
         break;
       case "VarDeclarator":
-        this.varDeclarator(currentNode);
+        this.varDeclarator(currentNode, ctx);
         break;
       case "WhileStmt":
-        this.whileStmt(currentNode);
+        this.whileStmt(currentNode, ctx);
         break;
       case "WithStmt":
-        this.withStmt(currentNode);
+        this.withStmt(currentNode, ctx);
         break;
       case "YieldExpr":
-        this.yieldExpr(currentNode);
+        this.yieldExpr(currentNode, ctx);
         break;
       default:
         assertUnreachable(currentNode);
     }
 
-    for (const child of Plugin.getChildrenOfNode(currentNode)) {
-      this.__traverse(child);
+    for (const child of ctx.getChildrenOfNode(currentNode)) {
+      this.__traverse(child, ctx);
     }
   }
 
   // entry point of a plugin, which is called from deno_lint
   __run(rootNode: Program) {
-    this.__traverse(rootNode);
+    this.__traverse(rootNode,this.__ctx);
   }
 }
