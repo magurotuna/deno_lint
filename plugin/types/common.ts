@@ -325,11 +325,6 @@ export type Node =
 
 export type NodeKind = Node["nodeKind"];
 
-export interface Traverse {
-  parentNode: () => Node | null;
-  childNodes: () => ReadonlyArray<Node>;
-}
-
 export interface Span {
   start: number;
   end: number;
