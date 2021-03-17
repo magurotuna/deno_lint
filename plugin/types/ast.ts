@@ -52,38 +52,38 @@ import type {
 
 export interface ArrayLit extends HasSpan {
   nodeKind: "ArrayLit";
-  elements: ReadonlyArray<ExprOrSpread | null>;
+  elems: ReadonlyArray<ExprOrSpread | null>;
 }
 
 export interface ArrayPat extends HasSpan {
   nodeKind: "ArrayPat";
-  elements: ReadonlyArray<Pat | null>;
-  typeAnnotation: TsTypeAnn | null;
   optional: boolean;
+  elems: ReadonlyArray<Pat | null>;
+  typeAnn: TsTypeAnn | null;
 }
 
 export interface ArrowExpr extends HasSpan {
   nodeKind: "ArrowExpr";
+  isAsync: boolean;
+  isGenerator: boolean;
   params: ReadonlyArray<Pat>;
   body: BodyStmtOrExpr;
-  typeParameters: TsTypeParamDecl | null;
+  typeParams: TsTypeParamDecl | null;
   returnType: TsTypeAnn | null;
-  async: boolean;
-  generator: boolean;
 }
 
 export interface AssignExpr extends HasSpan {
   nodeKind: "AssignExpr";
+  op: AssignOp;
   left: PatOrExpr;
   right: Expr;
-  operator: AssignOp;
 }
 
 export interface AssignPat extends HasSpan {
   nodeKind: "AssignPat";
   left: Pat;
   right: Expr;
-  typeAnnotation: TsTypeAnn | null;
+  typeAnn: TsTypeAnn | null;
 }
 
 export interface AssignPatProp extends HasSpan {
@@ -100,7 +100,7 @@ export interface AssignProp extends HasSpan {
 
 export interface AwaitExpr extends HasSpan {
   nodeKind: "AwaitExpr";
-  argument: Expr;
+  arg: Expr;
 }
 
 export interface BigInt_ extends HasSpan {
@@ -110,15 +110,14 @@ export interface BigInt_ extends HasSpan {
 
 export interface BinExpr extends HasSpan {
   nodeKind: "BinExpr";
+  op: BinaryOp;
   left: Expr;
   right: Expr;
-  operator: BinaryOp;
 }
 
 export interface BindingIdent extends HasSpan {
   nodeKind: "BindingIdent";
-  value: string;
-  optional: boolean;
+  id: Ident;
   typeAnnotation: TsTypeAnn | null;
 }
 
@@ -140,8 +139,8 @@ export interface BreakStmt extends HasSpan {
 export interface CallExpr extends HasSpan {
   nodeKind: "CallExpr";
   callee: ExprOrSuper;
-  arguments: ReadonlyArray<ExprOrSpread>;
-  typeArguments: TsTypeParamInstantiation | null;
+  args: ReadonlyArray<ExprOrSpread>;
+  typeArgs: TsTypeParamInstantiation | null;
 }
 
 export interface CatchClause extends HasSpan {
@@ -152,57 +151,41 @@ export interface CatchClause extends HasSpan {
 
 export interface Class extends HasSpan {
   nodeKind: "Class";
+  isAbstract: boolean;
   decorators: ReadonlyArray<Decorator>;
   body: ReadonlyArray<ClassMember>;
   superClass: Expr | null;
   typsParams: TsTypeParamDecl | null;
   superTypeParams: TsTypeParamInstantiation | null;
   implements: ReadonlyArray<TsExprWithTypeArgs>;
-  isAbstract: boolean;
 }
 
 export interface ClassDecl extends HasSpan {
   nodeKind: "ClassDecl";
-  identifier: Ident;
   declare: boolean;
-  decorators: ReadonlyArray<Decorator>;
-  body: ReadonlyArray<ClassMember>;
-  superClass: Expr | null;
-  typsParams: TsTypeParamDecl | null;
-  superTypeParams: TsTypeParamInstantiation | null;
-  implements: ReadonlyArray<TsExprWithTypeArgs>;
-  isAbstract: boolean;
+  ident: Ident;
+  class: Class;
 }
 
 export interface ClassExpr extends HasSpan {
   nodeKind: "ClassExpr";
-  identifier: Ident | null;
-  decorators: ReadonlyArray<Decorator>;
-  body: ReadonlyArray<ClassMember>;
-  superClass: Expr | null;
-  typsParams: TsTypeParamDecl | null;
-  superTypeParams: TsTypeParamInstantiation | null;
-  implements: ReadonlyArray<TsExprWithTypeArgs>;
-  isAbstract: boolean;
+  ident: Ident | null;
+  class: Class;
 }
 
 export interface ClassMethod extends HasSpan {
   nodeKind: "ClassMethod";
-  key: PropName;
-  function: Function_;
   kind: MethodKind;
   isStatic: boolean;
   accessibility: Accessibility | null;
   isAbstract: boolean;
   isOptional: boolean;
+  key: PropName;
+  function: Function_;
 }
 
 export interface ClassProp extends HasSpan {
   nodeKind: "ClassProp";
-  key: Expr;
-  value: Expr | null;
-  typeAnnotation: TsTypeAnn | null;
-  decorators: ReadonlyArray<Decorator>;
   isStatic: boolean;
   computed: boolean;
   accessibility: Accessibility | null;
@@ -211,27 +194,31 @@ export interface ClassProp extends HasSpan {
   readonly: boolean;
   declare: boolean;
   definite: boolean;
+  key: Expr;
+  value: Expr | null;
+  typeAnn: TsTypeAnn | null;
+  decorators: ReadonlyArray<Decorator>;
 }
 
 export interface ComputedPropName extends HasSpan {
   nodeKind: "ComputedPropName";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface CondExpr extends HasSpan {
   nodeKind: "CondExpr";
   test: Expr;
-  consequent: Expr;
-  alternate: Expr;
+  cons: Expr;
+  alt: Expr;
 }
 
 export interface Constructor extends HasSpan {
   nodeKind: "Constructor";
+  accessibility: Accessibility | null;
+  isOptional: boolean;
   key: PropName;
   params: ReadonlyArray<ParamOrTsParamProp>;
   body: BlockStmt | null;
-  accessibility: Accessibility | null;
-  isOptional: boolean;
 }
 
 export interface ContinueStmt extends HasSpan {
@@ -245,7 +232,7 @@ export interface DebuggerStmt extends HasSpan {
 
 export interface Decorator extends HasSpan {
   nodeKind: "Decorator";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface DoWhileStmt extends HasSpan {
@@ -260,24 +247,23 @@ export interface EmptyStmt extends HasSpan {
 
 export interface ExportAll extends HasSpan {
   nodeKind: "ExportAll";
-  source: Str;
+  src: Str;
   asserts: ObjectLit | null;
 }
 
 export interface ExportDecl extends HasSpan {
   nodeKind: "ExportDecl";
-  declaration: Decl;
+  decl: Decl;
 }
 
 export interface ExportDefaultDecl extends HasSpan {
   nodeKind: "ExportDefaultDecl";
-  // TODO(magurotuna): this is not "declaration" as of swc_ecma_ast 0.40.0
   decl: DefaultDecl;
 }
 
 export interface ExportDefaultExpr extends HasSpan {
   nodeKind: "ExportDefaultExpr";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface ExportDefaultSpecifier extends HasSpan {
@@ -298,38 +284,26 @@ export interface ExportNamespaceSpecifier extends HasSpan {
 
 export interface ExprOrSpread extends HasSpan {
   nodeKind: "ExprOrSpread";
-  expression: Expr;
   spread: Span | null;
+  expr: Expr;
 }
 
 export interface ExprStmt extends HasSpan {
   nodeKind: "ExprStmt";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface FnDecl extends HasSpan {
   nodeKind: "FnDecl";
-  identifier: Ident;
   declare: boolean;
-  params: ReadonlyArray<Param>;
-  decorators: ReadonlyArray<Decorator>;
-  body: BlockStmt | null;
-  typeParameters: TsTypeParamDecl | null;
-  returnType: TsTypeAnn | null;
-  generator: boolean;
-  async: boolean;
+  ident: Ident;
+  function: Function_;
 }
 
 export interface FnExpr extends HasSpan {
   nodeKind: "FnExpr";
-  identifier: Ident | null;
-  params: ReadonlyArray<Param>;
-  decorators: ReadonlyArray<Decorator>;
-  body: BlockStmt | null;
-  typeParameters: TsTypeParamDecl | null;
-  returnType: TsTypeAnn | null;
-  generator: boolean;
-  async: boolean;
+  ident: Ident | null;
+  function: Function_;
 }
 
 export interface ForInStmt extends HasSpan {
@@ -341,7 +315,7 @@ export interface ForInStmt extends HasSpan {
 
 export interface ForOfStmt extends HasSpan {
   nodeKind: "ForOfStmt";
-  await: Span | null;
+  awaitToken: Span | null;
   left: VarDeclOrPat;
   right: Expr;
   body: Stmt;
@@ -357,41 +331,41 @@ export interface ForStmt extends HasSpan {
 
 export interface Function_ extends HasSpan {
   nodeKind: "Function";
+  isGenerator: boolean;
+  isAsync: boolean;
   params: ReadonlyArray<Param>;
   decorators: ReadonlyArray<Decorator>;
   body: BlockStmt | null;
-  typeParameters: TsTypeParamDecl | null;
+  typeParams: TsTypeParamDecl | null;
   returnType: TsTypeAnn | null;
-  generator: boolean;
-  async: boolean;
 }
 
 export interface GetterProp extends HasSpan {
   nodeKind: "GetterProp";
   key: PropName;
-  typeAnnotation: TsTypeAnn | null;
+  typeAnn: TsTypeAnn | null;
   body: BlockStmt | null;
 }
 
 export interface Ident extends HasSpan {
   nodeKind: "Ident";
-  value: string;
+  sym: string;
   optional: boolean;
 }
 
 export interface IfStmt extends HasSpan {
   nodeKind: "IfStmt";
   test: Expr;
-  consequent: Stmt;
-  alternate: Stmt | null;
+  cons: Stmt;
+  alt: Stmt | null;
 }
 
 export interface ImportDecl extends HasSpan {
   nodeKind: "ImportDecl";
-  specifiers: ReadonlyArray<ImportSpecifier>;
-  source: Str;
-  asserts: ObjectLit | null;
   typeOnly: boolean;
+  specifiers: ReadonlyArray<ImportSpecifier>;
+  src: Str;
+  asserts: ObjectLit | null;
 }
 
 export interface ImportDefaultSpecifier extends HasSpan {
@@ -442,33 +416,34 @@ export interface JSXEmptyExpr extends HasSpan {
 
 export interface JSXExprContainer extends HasSpan {
   nodeKind: "JSXExprContainer";
-  expression: JSXExpr;
+  expr: JSXExpr;
 }
 
 export interface JSXFragment extends HasSpan {
   nodeKind: "JSXFragment";
   opening: JSXOpeningFragment;
   children: ReadonlyArray<JSXElementChild>;
-  closing: JSXClosingFragment | null;
+  closing: JSXClosingFragment;
 }
 
 export interface JSXMemberExpr extends HasSpan {
   nodeKind: "JSXMemberExpr";
-  object: JSXObject;
-  property: Ident;
+  obj: JSXObject;
+  prop: Ident;
 }
 
 export interface JSXNamespacedName extends HasSpan {
   nodeKind: "JSXNamespacedName";
-  namespace: Ident;
+  ns: Ident;
   name: Ident;
 }
 
 export interface JSXOpeningElement extends HasSpan {
   nodeKind: "JSXOpeningElement";
-  attributes: ReadonlyArray<JSXAttrOrSpread>;
   selfClosing: boolean;
-  typeArguments: TsTypeParamInstantiation | null;
+  name: JSXElementName;
+  attrs: ReadonlyArray<JSXAttrOrSpread>;
+  typeArgs: TsTypeParamInstantiation | null;
 }
 
 export interface JSXOpeningFragment extends HasSpan {
@@ -477,7 +452,7 @@ export interface JSXOpeningFragment extends HasSpan {
 
 export interface JSXSpreadChild extends HasSpan {
   nodeKind: "JSXSpreadChild";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface JSXText extends HasSpan {
@@ -495,7 +470,7 @@ export interface KeyValuePatProp extends HasSpan {
 export interface KeyValueProp extends HasSpan {
   nodeKind: "KeyValueProp";
   key: PropName;
-  value: Pat;
+  value: Expr;
 }
 
 export interface LabeledStmt extends HasSpan {
@@ -506,48 +481,42 @@ export interface LabeledStmt extends HasSpan {
 
 export interface MemberExpr extends HasSpan {
   nodeKind: "MemberExpr";
-  object: ExprOrSuper;
-  property: Expr;
   computed: boolean;
+  obj: ExprOrSuper;
+  prop: Expr;
 }
 
 export interface MetaPropExpr extends HasSpan {
   nodeKind: "MetaPropExpr";
   meta: Ident;
-  property: Ident;
+  prop: Ident;
 }
 
 export interface MethodProp extends HasSpan {
   nodeKind: "MethodProp";
   key: PropName;
-  params: ReadonlyArray<Param>;
-  decorators: ReadonlyArray<Decorator>;
-  body: BlockStmt | null;
-  typeParameters: TsTypeParamDecl | null;
-  returnType: TsTypeAnn | null;
-  generator: boolean;
-  async: boolean;
+  function: Function_;
 }
 
 export interface Module extends HasSpan {
   nodeKind: "Module";
+  shebang: string | null;
   body: ReadonlyArray<ModuleItem>;
-  interpreter: string | null;
 }
 
 export interface NamedExport extends HasSpan {
   nodeKind: "NamedExport";
-  specifiers: ReadonlyArray<ExportSpecifier>;
-  source: Str | null;
   typeOnly: boolean;
+  specifiers: ReadonlyArray<ExportSpecifier>;
+  src: Str | null;
   asserts: ObjectLit | null;
 }
 
 export interface NewExpr extends HasSpan {
   nodeKind: "NewExpr";
   callee: Expr;
-  arguments: ReadonlyArray<ExprOrSpread> | null;
-  typeArguments: TsTypeParamInstantiation | null;
+  args: ReadonlyArray<ExprOrSpread> | null;
+  typeArgs: TsTypeParamInstantiation | null;
 }
 
 export interface Null extends HasSpan {
@@ -561,20 +530,19 @@ export interface Number_ extends HasSpan {
 
 export interface ObjectLit extends HasSpan {
   nodeKind: "ObjectLit";
-  properties: ReadonlyArray<PropOrSpread>;
+  props: ReadonlyArray<PropOrSpread>;
 }
 
 export interface ObjectPat extends HasSpan {
   nodeKind: "ObjectPat";
-  properties: ReadonlyArray<ObjectPatProp>;
   optional: boolean;
-  typeAnnotation: TsTypeAnn | null;
+  props: ReadonlyArray<ObjectPatProp>;
+  typeAnn: TsTypeAnn | null;
 }
 
 export interface OptChainExpr extends HasSpan {
   nodeKind: "OptChainExpr";
   questionDotToken: Span;
-  // TODO(magurotuna): this is not "expression" as of swc_ecma_ast 0.40.0
   expr: Expr;
 }
 
@@ -586,68 +554,67 @@ export interface Param extends HasSpan {
 
 export interface ParenExpr extends HasSpan {
   nodeKind: "ParenExpr";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface PrivateMethod extends HasSpan {
   nodeKind: "PrivateMethod";
-  key: PrivateName;
-  function: Function_;
   kind: MethodKind;
   isStatic: boolean;
   accessibility: Accessibility | null;
   isAbstract: boolean;
   isOptional: boolean;
+  key: PrivateName;
+  function: Function_;
 }
 
 export interface PrivateName extends HasSpan {
   nodeKind: "PrivateName";
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: Ident;
 }
 
 export interface PrivateProp extends HasSpan {
   nodeKind: "PrivateProp";
-  key: PrivateName;
-  value: Expr | null;
-  typeAnnotation: TsTypeAnn | null;
   isStatic: boolean;
-  decorators: ReadonlyArray<Decorator>;
   computed: boolean;
   accessibility: Accessibility | null;
   isAbstract: boolean;
   isOptiona: boolean;
   readonly: boolean;
   definite: boolean;
+  key: PrivateName;
+  value: Expr | null;
+  typeAnn: TsTypeAnn | null;
+  decorators: ReadonlyArray<Decorator>;
 }
 
 export interface Regex extends HasSpan {
   nodeKind: "Regex";
-  pattern: string;
+  exp: string;
   flags: string;
 }
 
 export interface RestPat extends HasSpan {
   nodeKind: "RestPat";
-  rest: Span;
-  argument: Pat;
-  typeAnnotation: TsTypeAnn | null;
+  dot3Token: Span;
+  arg: Pat;
+  typeAnn: TsTypeAnn | null;
 }
 
 export interface ReturnStmt extends HasSpan {
   nodeKind: "ReturnStmt";
-  argument: Expr | null;
+  arg: Expr | null;
 }
 
 export interface Script extends HasSpan {
   nodeKind: "Script";
+  shebang: string | null;
   body: ReadonlyArray<Stmt>;
-  interpreter: string | null;
 }
 
 export interface SeqExpr extends HasSpan {
   nodeKind: "SeqExpr";
-  expressions: ReadonlyArray<Expr>;
+  exprs: ReadonlyArray<Expr>;
 }
 
 export interface SetterProp extends HasSpan {
@@ -659,9 +626,8 @@ export interface SetterProp extends HasSpan {
 
 export interface SpreadElement extends HasSpan {
   nodeKind: "SpreadElement";
-  spread: Span;
-  // FIXME(magurotuna): this should be `argument`?
-  arguments: Expr;
+  dot3Token: Span;
+  expr: Expr;
 }
 
 export interface Str extends HasSpan {
@@ -678,7 +644,7 @@ export interface Super extends HasSpan {
 export interface SwitchCase extends HasSpan {
   nodeKind: "SwitchCase";
   test: Expr | null;
-  consequent: ReadonlyArray<Stmt>;
+  cons: ReadonlyArray<Stmt>;
 }
 
 export interface SwitchStmt extends HasSpan {
@@ -690,9 +656,9 @@ export interface SwitchStmt extends HasSpan {
 export interface TaggedTpl extends HasSpan {
   nodeKind: "TaggedTpl";
   tag: Expr;
-  expressions: ReadonlyArray<Expr>;
+  exprs: ReadonlyArray<Expr>;
   quasis: ReadonlyArray<TplElement>;
-  typeParameters: TsTypeParamInstantiation | null;
+  typeParams: TsTypeParamInstantiation | null;
 }
 
 export interface ThisExpr extends HasSpan {
@@ -701,12 +667,12 @@ export interface ThisExpr extends HasSpan {
 
 export interface ThrowStmt extends HasSpan {
   nodeKind: "ThrowStmt";
-  argument: Expr;
+  arg: Expr;
 }
 
 export interface Tpl extends HasSpan {
   nodeKind: "Tpl";
-  expressions: ReadonlyArray<Expr>;
+  exprs: ReadonlyArray<Expr>;
   quasis: ReadonlyArray<TplElement>;
 }
 
@@ -731,14 +697,14 @@ export interface TsArrayType extends HasSpan {
 
 export interface TsAsExpr extends HasSpan {
   nodeKind: "TsAsExpr";
-  expression: Expr;
-  typeAnnotation: TsType;
+  expr: Expr;
+  typeAnn: TsType;
 }
 
 export interface TsCallSignatureDecl extends HasSpan {
   nodeKind: "TsCallSignatureDecl";
   params: ReadonlyArray<TsFnParam>;
-  typeAnnotation: TsTypeAnn | null;
+  typeAnn: TsTypeAnn | null;
   typeParams: TsTypeParamDecl | null;
 }
 
@@ -752,90 +718,87 @@ export interface TsConditionalType extends HasSpan {
 
 export interface TsConstAssertion extends HasSpan {
   nodeKind: "TsConstAssertion";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface TsConstructSignatureDecl extends HasSpan {
   nodeKind: "TsConstructSignatureDecl";
   params: ReadonlyArray<TsFnParam>;
-  typeAnnotation: TsTypeAnn | null;
+  typeAnn: TsTypeAnn | null;
   typeParams: TsTypeParamDecl | null;
 }
 
 export interface TsConstructorType extends HasSpan {
   nodeKind: "TsConstructorType";
+  isAbstract: boolean;
   params: ReadonlyArray<TsFnParam>;
   typeParams: TsTypeParamDecl | null;
-  typeAnnotation: TsTypeAnn;
-  isAbstract: boolean;
+  typeAnn: TsTypeAnn;
 }
 
 export interface TsEnumDecl extends HasSpan {
   nodeKind: "TsEnumDecl";
   declare: boolean;
   isConst: boolean;
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: Ident;
   members: ReadonlyArray<TsEnumMember>;
 }
 
 export interface TsEnumMember extends HasSpan {
   nodeKind: "TsEnumMember";
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: TsEnumMemberId;
   init: Expr | null;
 }
 
 export interface TsExportAssignment extends HasSpan {
   nodeKind: "TsExportAssignment";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface TsExprWithTypeArgs extends HasSpan {
   nodeKind: "TsExprWithTypeArgs";
-  expression: TsEntityName;
-  typeArguments: TsTypeParamInstantiation | null;
+  expr: TsEntityName;
+  typeArgs: TsTypeParamInstantiation | null;
 }
 
 export interface TsExternalModuleRef extends HasSpan {
   nodeKind: "TsExternalModuleRef";
-  expression: Str;
+  expr: Str;
 }
 
 export interface TsFnType extends HasSpan {
   nodeKind: "TsFnType";
   params: ReadonlyArray<TsFnParam>;
   typeParams: TsTypeParamDecl | null;
-  typeAnnotation: TsTypeAnn;
+  typeAnn: TsTypeAnn;
 }
 
 export interface TsImportEqualsDecl extends HasSpan {
   nodeKind: "TsImportEqualsDecl";
   declare: boolean;
   isExport: boolean;
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: Ident;
   moduleRef: TsModuleRef;
 }
 
 export interface TsImportType extends HasSpan {
   nodeKind: "TsImportType";
-  argument: Str;
+  arg: Str;
   qualifier: TsEntityName | null;
-  typeArguments: TsTypeParamInstantiation | null;
+  typeArgs: TsTypeParamInstantiation | null;
 }
 
 export interface TsIndexSignature extends HasSpan {
   nodeKind: "TsIndexSignature";
-  params: ReadonlyArray<TsFnParam>;
-  typeAnnotation: TsTypeAnn | null;
   readonly: boolean;
+  params: ReadonlyArray<TsFnParam>;
+  typeAnn: TsTypeAnn | null;
 }
 
 export interface TsIndexedAccessType extends HasSpan {
   nodeKind: "TsIndexedAccessType";
   readonly: boolean;
-  objectType: TsType;
+  objType: TsType;
   indexType: TsType;
 }
 
@@ -851,9 +814,8 @@ export interface TsInterfaceBody extends HasSpan {
 
 export interface TsInterfaceDecl extends HasSpan {
   nodeKind: "TsInterfaceDecl";
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
-  id: Ident;
   declare: boolean;
+  id: Ident;
   typeParams: TsTypeParamDecl | null;
   extends: ReadonlyArray<TsExprWithTypeArgs>;
   body: TsInterfaceBody;
@@ -871,26 +833,25 @@ export interface TsKeywordType extends HasSpan {
 
 export interface TsLitType extends HasSpan {
   nodeKind: "TsLitType";
-  literal: TsLit;
+  lit: TsLit;
 }
 
 export interface TsMappedType extends HasSpan {
   nodeKind: "TsMappedType";
   readonly: TruePlusMinus | null;
+  optional: TruePlusMinus | null;
   typeParam: TsTypeParam;
   nameType: TsType | null;
-  optional: TruePlusMinus | null;
   typeAnnotation: TsType | null;
 }
 
 export interface TsMethodSignature extends HasSpan {
   nodeKind: "TsMethodSignature";
   readonly: boolean;
-  key: Expr;
   computed: boolean;
   optional: boolean;
+  key: Expr;
   params: ReadonlyArray<TsFnParam>;
-  // TODO(magurotuna): this is not "typeAnnotation" as of swc_ecma_ast 0.40.0
   typeAnn: TsTypeAnn | null;
   typeParams: TsTypeParamDecl | null;
 }
@@ -904,7 +865,6 @@ export interface TsModuleDecl extends HasSpan {
   nodeKind: "TsModuleDecl";
   declare: boolean;
   global: boolean;
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: TsModuleName;
   body: TsNamespaceBody | null;
 }
@@ -913,49 +873,47 @@ export interface TsNamespaceDecl extends HasSpan {
   nodeKind: "TsNamespaceDecl";
   declare: boolean;
   global: boolean;
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: Ident;
   body: TsNamespaceBody;
 }
 
 export interface TsNamespaceExportDecl extends HasSpan {
   nodeKind: "TsNamespaceExportDecl";
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: Ident;
 }
 
 export interface TsNonNullExpr extends HasSpan {
   nodeKind: "TsNonNullExpr";
-  expression: Expr;
+  expr: Expr;
 }
 
 export interface TsOptionalType extends HasSpan {
   nodeKind: "TsOptionalType";
-  typeAnnotation: TsType;
+  typeAnn: TsType;
 }
 
 export interface TsParamProp extends HasSpan {
   nodeKind: "TsParamProp";
-  decorators: ReadonlyArray<Decorator>;
   accessibility: Accessibility | null;
   readonly: boolean;
+  decorators: ReadonlyArray<Decorator>;
   param: TsParamPropParam;
 }
 
 export interface TsParenthesizedType extends HasSpan {
   nodeKind: "TsParenthesizedType";
-  typeAnnotation: TsType;
+  typeAnn: TsType;
 }
 
 export interface TsPropertySignature extends HasSpan {
   nodeKind: "TsPropertySignature";
   readonly: boolean;
-  key: Expr;
   computed: boolean;
   optional: boolean;
+  key: Expr;
   init: Expr | null;
   params: ReadonlyArray<TsFnParam>;
-  typeAnnotation: TsTypeAnn | null;
+  typeAnn: TsTypeAnn | null;
   typeParams: TsTypeParamDecl | null;
 }
 
@@ -967,7 +925,7 @@ export interface TsQualifiedName extends HasSpan {
 
 export interface TsRestType extends HasSpan {
   nodeKind: "TsRestType";
-  typeAnnotation: TsType;
+  typeAnn: TsType;
 }
 
 export interface TsThisType extends HasSpan {
@@ -983,7 +941,6 @@ export interface TsTplLitType extends HasSpan {
 export interface TsTupleElement extends HasSpan {
   nodeKind: "TsTupleElement";
   label: Pat | null;
-  // TODO(magurotuna): this is not "type" as of swc_ecma_ast 0.40.0
   ty: TsType;
 }
 
@@ -995,21 +952,20 @@ export interface TsTupleType extends HasSpan {
 export interface TsTypeAliasDecl extends HasSpan {
   nodeKind: "TsTypeAliasDecl";
   declare: boolean;
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
   id: Ident;
   typeParams: TsTypeParamDecl | null;
-  typeAnnotation: TsType;
+  typeAnn: TsType;
 }
 
 export interface TsTypeAnn extends HasSpan {
   nodeKind: "TsTypeAnn";
-  typeAnnotation: TsType;
+  typeAnn: TsType;
 }
 
 export interface TsTypeAssertion extends HasSpan {
   nodeKind: "TsTypeAssertion";
-  expression: Expr;
-  typeAnnotation: TsType;
+  expr: Expr;
+  typeAnn: TsType;
 }
 
 export interface TsTypeLit extends HasSpan {
@@ -1019,9 +975,8 @@ export interface TsTypeLit extends HasSpan {
 
 export interface TsTypeOperator extends HasSpan {
   nodeKind: "TsTypeOperator";
-  // TODO(magurotuna): this is not "operator" as of swc_ecma_ast 0.40.0
   op: TsTypeOperatorOp;
-  typeAnnotation: TsType;
+  typeAnn: TsType;
 }
 
 export interface TsTypeParam extends HasSpan {
@@ -1033,13 +988,11 @@ export interface TsTypeParam extends HasSpan {
 
 export interface TsTypeParamDecl extends HasSpan {
   nodeKind: "TsTypeParamDecl";
-  // TODO(magurotuna): should be "params"? "parameters"?
-  parameters: ReadonlyArray<TsTypeParam>;
+  params: ReadonlyArray<TsTypeParam>;
 }
 
 export interface TsTypeParamInstantiation extends HasSpan {
   nodeKind: "TsTypeParamInstantiation";
-  // TODO(magurotuna): should be "params"? "parameters"?
   params: ReadonlyArray<TsType>;
 }
 
@@ -1047,7 +1000,7 @@ export interface TsTypePredicate extends HasSpan {
   nodeKind: "TsTypePredicate";
   asserts: boolean;
   paramName: TsThisTypeOrIdent;
-  typeAnnotation: TsTypeAnn | null;
+  typeAnn: TsTypeAnn | null;
 }
 
 export interface TsTypeQuery extends HasSpan {
@@ -1068,30 +1021,29 @@ export interface TsUnionType extends HasSpan {
 
 export interface UnaryExpr extends HasSpan {
   nodeKind: "UnaryExpr";
-  operator: UnaryOp;
-  argument: Expr;
+  op: UnaryOp;
+  arg: Expr;
 }
 
 export interface UpdateExpr extends HasSpan {
   nodeKind: "UpdateExpr";
-  operator: UpdateOp;
+  op: UpdateOp;
   prefix: boolean;
-  argument: Expr;
+  arg: Expr;
 }
 
 export interface VarDecl extends HasSpan {
   nodeKind: "VarDecl";
   kind: VarDeclKind;
   declare: boolean;
-  declarations: ReadonlyArray<VarDeclarator>;
+  decls: ReadonlyArray<VarDeclarator>;
 }
 
 export interface VarDeclarator extends HasSpan {
   nodeKind: "VarDeclarator";
-  // TODO(magurotuna): this is not "identifier" as of swc_ecma_ast 0.40.0
-  id: Pat;
-  init: Expr | null;
   definite: boolean;
+  name: Pat;
+  init: Expr | null;
 }
 
 export interface WhileStmt extends HasSpan {
@@ -1102,12 +1054,12 @@ export interface WhileStmt extends HasSpan {
 
 export interface WithStmt extends HasSpan {
   nodeKind: "WithStmt";
-  object: Expr;
+  obj: Expr;
   body: Stmt;
 }
 
 export interface YieldExpr extends HasSpan {
   nodeKind: "YieldExpr";
-  argument: Expr | null;
   delegate: boolean;
+  arg: Expr | null;
 }
