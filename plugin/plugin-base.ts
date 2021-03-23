@@ -169,6 +169,9 @@ function assertUnreachable(_x: never): never {
 }
 
 export abstract class Plugin {
+  // Must be overriden to identify the code of this lint rule.
+  abstract ruleCode: string;
+
   ////////////////////////////////////////////
   // handlers
   //
