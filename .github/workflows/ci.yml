@@ -1,6 +1,6 @@
 name: ci
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   rust:
@@ -25,16 +25,6 @@ jobs:
         uses: hecrj/setup-rust-action@v1.3.4
         with:
           rust-version: 1.53.0
-
-      - name: Install clippy and rustfmt
-        run: |
-          rustup component add clippy
-          rustup component add rustfmt
-
-      - name: Install Deno
-        uses: denolib/setup-deno@master
-        with:
-          deno-version: v1.7.5
 
       - name: Cache
         uses: actions/cache@v2
